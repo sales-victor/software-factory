@@ -10,8 +10,8 @@
     {
       "name": "software-factory",
       "source": "./plugins/software-factory",
-      "description": "Multi-agent software factory with orchestrated architecture, UX/UI, backend, frontend, DBA, QA, security, code review and DevOps",
-      "version": "1.1.0",
+      "description": "Multi-agent software factory",
+      "version": "1.1.1",
       "category": "development"
     }
   ]
