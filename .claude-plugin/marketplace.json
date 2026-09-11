@@ -4,14 +4,14 @@
     "name": "Joao Sales"
   },
   "metadata": {
-    "description": "Software Factory multi-agent marketplace for Claude Code"
+    "description": "AI Software Factory for Claude Code"
   },
   "plugins": [
     {
       "name": "software-factory",
       "source": "./plugins/software-factory",
-      "description": "Multi-agent software development factory with architecture, backend, frontend, UX/UI, DBA, security, QA, code review and DevOps specialists",
-      "version": "1.0.0",
+      "description": "Multi-agent software factory with orchestrated architecture, UX/UI, backend, frontend, DBA, QA, security, code review and DevOps",
+      "version": "1.1.0",
       "category": "development"
     }
   ]
