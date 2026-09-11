@@ -1,0 +1,18 @@
+{
+  "name": "software-factory-marketplace",
+  "owner": {
+    "name": "Joao Sales"
+  },
+  "metadata": {
+    "description": "Software Factory multi-agent marketplace for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "software-factory",
+      "source": "./plugins/software-factory",
+      "description": "Multi-agent software development factory with architecture, backend, frontend, UX/UI, DBA, security, QA, code review and DevOps specialists",
+      "version": "1.0.0",
+      "category": "development"
+    }
+  ]
+}

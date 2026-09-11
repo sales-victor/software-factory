@@ -1,0 +1,8 @@
+{
+    "name": "software-factory",
+    "version": "1.0.0",
+    "description": "Multi-agent software development factory",
+    "author": {
+        "name": "Joao Sales"
+    }
+}
