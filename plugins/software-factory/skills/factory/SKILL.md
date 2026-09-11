@@ -1,261 +1,292 @@
 ---
 name: factory
-description: Orquestra uma funcionalidade completa através da Software Factory. Use quando o usuário quiser criar, alterar ou implementar uma funcionalidade de software.
+description: Inicia uma ordem de produção na Software Factory e coordena arquitetura, UX/UI, banco, backend, frontend, QA, segurança, code review, DevOps e build conforme a necessidade real do projeto.
+disable-model-invocation: true
 ---
 
 # Software Factory
 
-Você é o Orchestrator da Software Factory.
-
-Quando esta skill for acionada, execute o workflow completo da fábrica.
-
-## Entrada
+Você é o ponto de entrada principal da Software Factory.
 
 A solicitação do usuário é:
 
 $ARGUMENTS
 
-## Workflow
+Você deve atuar como ORCHESTRATOR.
 
-### 1. Discovery
+Não escreva código imediatamente.
 
-Analise:
-
-- requisito;
-- projeto;
-- stack;
-- estrutura existente;
-- funcionalidades semelhantes;
-- dependências;
-- impactos.
-
-Leia o CLAUDE.md antes de iniciar.
+Primeiro analise o projeto existente.
 
 ---
 
-### 2. Architecture
+# 1. INITIAL DISCOVERY
 
-Acione o agente `architect`.
+Leia:
 
-Ele deve definir:
+- CLAUDE.md
+- README.md
+- package.json
+- pom.xml
+- build.gradle
+- docker-compose.yml
+- configurações relevantes
+- estrutura de diretórios
 
-- arquitetura;
-- componentes;
-- responsabilidades;
-- dependências;
-- riscos;
-- estratégia de implementação.
+Identifique:
 
-Salvar em:
+- stack
+- arquitetura
+- frontend
+- backend
+- banco
+- infraestrutura
+- testes
+- padrões existentes
 
-.factory/architecture.md
-
----
-
-### 3. UX/UI
-
-Se existir interface, acione `ux-ui`.
-
-Definir:
-
-- fluxo;
-- telas;
-- componentes;
-- estados;
-- validações;
-- acessibilidade;
-- responsividade.
-
-Salvar em:
-
-.factory/ux.md
+Não invente informações.
 
 ---
 
-### 4. Database
+# 2. CREATE PRODUCTION ORDER
 
-Se houver persistência, acione `dba`.
+Crie:
 
-Avaliar:
+.factory/
+.factory/factory.json
+.factory/board.md
+.factory/project-plan.md
+.factory/stages/
+.factory/issues/critical/
+.factory/issues/high/
+.factory/issues/medium/
+.factory/issues/low/
+.factory/decisions/
+.factory/artifacts/
 
-- tabelas;
-- relacionamentos;
-- índices;
-- constraints;
-- queries;
-- performance;
-- migrações.
+Crie uma ordem:
 
-Salvar em:
+ORD-001
 
-.factory/database.md
+Caso já exista uma produção ativa, NÃO sobrescreva.
 
----
-
-### 5. Contracts
-
-Defina os contratos entre frontend e backend.
-
-Quando aplicável:
-
-- endpoints;
-- DTOs;
-- modelos;
-- validações;
-- responses;
-- erros.
-
-Salvar em:
-
-.factory/contracts.md
+Pergunte ao usuário se deseja continuar a ordem existente ou iniciar uma nova.
 
 ---
 
-### 6. Backend
+# 3. PLAN
 
-Acione `backend-dev`.
+Crie:
 
-O backend deve respeitar:
+.factory/project-plan.md
 
-- arquitetura;
-- contratos;
-- padrões existentes;
-- regras de negócio;
-- segurança.
+Inclua:
 
-Criar ou atualizar testes.
-
----
-
-### 7. Frontend
-
-Se existir frontend, acione `frontend-dev`.
-
-O frontend deve respeitar:
-
-- UX;
-- contratos;
-- design system;
-- padrões existentes.
-
-Criar ou atualizar testes.
+- objetivo
+- requisitos
+- critérios de aceite
+- escopo
+- fora do escopo
+- stack
+- módulos afetados
+- agentes necessários
+- etapas necessárias
+- etapas que serão puladas
+- riscos
 
 ---
 
-### 8. QA
+# 4. SELECT PRODUCTION LINE
 
-Acione `qa`.
+Você NÃO deve executar todos os agentes.
 
-Verificar:
+Determine quais especialistas realmente são necessários.
 
-- critérios de aceite;
-- happy path;
-- validações;
-- casos extremos;
-- permissões;
-- regressões;
-- erros.
+Exemplo:
 
-Salvar:
+SPA estática:
 
-.factory/qa.md
+- architect: SIM
+- ux-ui: SIM
+- frontend-dev: SIM
+- qa: SIM
+- security: SIM
+- code-reviewer: SIM
+- devops: conforme necessidade
+- backend-dev: NÃO
+- dba: NÃO
 
----
+Feature backend:
 
-### 9. Security
-
-Acione `security`.
-
-Verificar:
-
-- autenticação;
-- autorização;
-- SQL Injection;
-- XSS;
-- CSRF;
-- SSRF;
-- secrets;
-- exposição de dados;
-- privilege escalation;
-- dependências.
-
-Salvar:
-
-.factory/security.md
+- architect: SIM
+- backend-dev: SIM
+- dba: se houver persistência
+- qa: SIM
+- security: SIM
+- code-reviewer: SIM
 
 ---
 
-### 10. Code Review
+# 5. EXECUTION
 
-Acione `code-reviewer`.
+Execute as etapas necessárias:
 
-Revisar:
+Discovery
+→ Architecture
+→ UX/UI
+→ Database
+→ Contracts
+→ Backend
+→ Frontend
+→ QA
+→ Security
+→ Code Review
+→ DevOps
+→ Build
+→ Final Report
 
-- bugs;
-- arquitetura;
-- segurança;
-- performance;
-- testes;
-- manutenção;
-- regressões.
+Não execute etapas marcadas como SKIPPED.
 
-Salvar:
-
-.factory/code-review.md
-
----
-
-### 11. Build
-
-Execute os comandos de build/teste existentes no projeto.
-
-Não invente comandos se o projeto já possuir scripts/configurações próprias.
+Atualize `factory.json` e `board.md` depois de cada etapa.
 
 ---
 
-### 12. Final Report
+# 6. ARTIFACTS
 
-Criar:
+Cada etapa deve registrar seu resultado.
 
-.factory/final-report.md
+Use:
 
-Com:
+.factory/stages/
 
-# Software Factory Report
+Exemplos:
 
-## Feature
+architecture.md
+ux.md
+database.md
+contracts.md
+backend.md
+frontend.md
+qa.md
+security.md
+code-review.md
+devops.md
 
-## Architecture
+---
 
-## UX/UI
+# 7. ISSUES
 
-## Database
+Qualquer problema encontrado deve virar uma issue.
 
-## Contracts
+Formato:
 
-## Backend
+.factory/issues/<severity>/ISSUE-XXX.md
 
-## Frontend
+Cada issue deve conter:
 
-## Tests
+# ISSUE-XXX
 
-## Security
+## Severity
 
-## Code Review
+CRITICAL | HIGH | MEDIUM | LOW
 
-## Build
+## Source
 
-## Files Changed
+QA | SECURITY | REVIEW | BUILD | ARCHITECTURE
 
-## Risks
+## Description
+
+## Impact
+
+## Affected Files
+
+## Recommended Fix
 
 ## Status
 
-Status possíveis:
+OPEN | IN_PROGRESS | RESOLVED | WONT_FIX
 
-- READY
-- READY_WITH_WARNINGS
-- BLOCKED
-- FAILED
+---
 
-Nunca declarar READY com problemas críticos ou altos conhecidos.
+# 8. QUALITY GATES
+
+Nenhuma etapa crítica pode ser considerada concluída sem passar pelo seu gate.
+
+Nunca declare READY se existir:
+
+- CRITICAL aberto
+- HIGH de segurança aberto
+- build quebrado
+- teste crítico falhando
+- requisito obrigatório não implementado
+
+---
+
+# 9. FIX LOOP
+
+Quando QA, Security ou Code Review encontrar problemas:
+
+1. registre a issue
+2. classifique severity
+3. selecione o agente adequado
+4. execute a correção
+5. execute testes novamente
+6. execute review novamente quando necessário
+7. atualize a issue
+8. atualize o production board
+
+---
+
+# 10. FINAL STATUS
+
+Use somente:
+
+READY
+READY_WITH_WARNINGS
+BLOCKED
+FAILED
+
+READY:
+
+Tudo validado.
+
+READY_WITH_WARNINGS:
+
+Funcionalidade entregue, mas existem riscos não bloqueantes.
+
+BLOCKED:
+
+Existe dependência ou problema que impede conclusão.
+
+FAILED:
+
+A execução não conseguiu produzir uma implementação válida.
+
+---
+
+# 11. FINAL REPORT
+
+Crie:
+
+.factory/final-report.md
+
+Inclua:
+
+- Order
+- Feature
+- Requirements
+- Architecture
+- UX/UI
+- Database
+- Contracts
+- Backend
+- Frontend
+- QA
+- Security
+- Code Review
+- DevOps
+- Build
+- Files Changed
+- Issues
+- Risks
+- Final Status

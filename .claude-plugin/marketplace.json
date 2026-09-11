@@ -4,14 +4,14 @@
     "name": "Joao Sales"
   },
   "metadata": {
-    "description": "AI Software Factory for Claude Code"
+    "description": "AI Software Factory with persistent production board and multi-agent orchestration"
   },
   "plugins": [
     {
       "name": "software-factory",
       "source": "./plugins/software-factory",
-      "description": "Multi-agent software factory",
-      "version": "1.1.1",
+      "description": "AI Software Factory with orchestrator, production board, quality gates, security, testing, review and automated fixes",
+      "version": "1.2.0",
       "category": "development"
     }
   ]
