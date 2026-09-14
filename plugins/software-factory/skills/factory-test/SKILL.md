@@ -1,65 +1,30 @@
 ---
 name: factory-test
-description: Executa os testes apropriados para a stack do projeto e atualiza o QA Gate da Software Factory.
-disable-model-invocation: true
+description: Roda testes e build do projeto usando os comandos registrados em .factory/context.md e atualiza os gates qa e build. Aceita escopo direcionado como argumento.
 ---
 
 # Factory Test
 
-Leia:
+Leia `.factory/factory.json` e `.factory/context.md`.
 
-.factory/factory.json
-.factory/project-plan.md
+Argumento opcional: `$ARGUMENTS` = escopo direcionado (ex.: `-Dtest=FaturaServiceTest`, `--include=**/x.spec.ts`). Sem argumento = suíte completa + build.
 
-Identifique a stack automaticamente.
+Comandos: use SOMENTE os listados em `context.md` (vindos do CLAUDE.md / manifests do projeto). Não invente comandos.
 
-Não invente comandos.
+Cuidados:
 
-Procure:
+- Nunca rode comando que fica em watch mode (`ng test` sem `--watch=false`, `npm run watch`, `ng serve`). Prefira `--watch=false --browsers=ChromeHeadless` ou typecheck (`npx tsc --noEmit`).
+- Projeto sem suíte ativa: registre "sem suíte" — não é falha.
+- Comando acima de 10 min: interrompa e registre.
 
-package.json
-pom.xml
-build.gradle
-pytest.ini
-pyproject.toml
-Dockerfile
-docker-compose.yml
-etc.
+Registre em `.factory/stages/qa.md` (append, seção `## Execução <data>`): comando, aprovados/falhos/ignorados, build, erros (só a linha decisiva de cada erro, não o log inteiro).
 
-Execute os testes existentes e apropriados.
+Atualize `factory.json`: `gates.qa` e `gates.build`. Teste crítico falhando → gate `FAILED`; nunca declare READY.
 
-Exemplos:
+Responda:
 
-Angular:
-npm test
-npm run build
-
-Java:
-mvn test
-mvn verify
-
-Python:
-pytest
-
-Use os comandos realmente existentes no projeto.
-
-Registre:
-
-- testes executados
-- testes aprovados
-- testes falhos
-- testes ignorados
-- build
-- erros
-
-Atualize:
-
-.factory/stages/qa.md
-.factory/factory.json
-.factory/board.md
-
-Se testes críticos falharem:
-
-QA Gate = FAILED
-
-Não declare READY.
+```
+TESTS: <cmd> → ok|fail (n passed, n failed, n skipped)
+BUILD: <cmd> → ok|fail
+FAIL: path:line: erro
+```

@@ -1,292 +1,199 @@
 ---
 name: factory
-description: Inicia uma ordem de produção na Software Factory e coordena arquitetura, UX/UI, banco, backend, frontend, QA, segurança, code review, DevOps e build conforme a necessidade real do projeto.
+description: Inicia uma ordem de produção na Software Factory - discovery único, plano, tier (quick/standard/full), delegação a agentes especializados, quality gates, fix loop e relatório final.
 disable-model-invocation: true
 ---
 
-# Software Factory
+# Software Factory — Orchestrator
 
-Você é o ponto de entrada principal da Software Factory.
+Você é o ORCHESTRATOR (Tech Lead) desta ordem. Você não escreve todo o código.
 
-A solicitação do usuário é:
+ANALYSE → PLAN → DELEGATE → VALIDATE → INTEGRATE → VERIFY
+
+Solicitação:
 
 $ARGUMENTS
 
-Você deve atuar como ORCHESTRATOR.
-
-Não escreva código imediatamente.
-
-Primeiro analise o projeto existente.
+Não escreva código antes de concluir discovery e plano.
 
 ---
 
-# 1. INITIAL DISCOVERY
+## 0. Regras de economia de tokens (obrigatórias)
 
-Leia:
-
-- CLAUDE.md
-- README.md
-- package.json
-- pom.xml
-- build.gradle
-- docker-compose.yml
-- configurações relevantes
-- estrutura de diretórios
-
-Identifique:
-
-- stack
-- arquitetura
-- frontend
-- backend
-- banco
-- infraestrutura
-- testes
-- padrões existentes
-
-Não invente informações.
+- Discovery acontece UMA vez, aqui. Agentes recebem `.factory/context.md` e não refazem discovery.
+- Toda delegação lista os arquivos relevantes com caminho (e linhas quando souber). Agente não lê fora da lista sem necessidade real.
+- Agente grava artifact em `.factory/stages/<stage>.md` e responde só com o resumo compacto (seção 6). Nunca repete o artifact na resposta.
+- QA, Security e Code Review analisam `git diff <baseCommit>` + arquivos tocados, não o repositório inteiro.
+- `factory.json` é a única fonte de verdade. `board.md` só é gerado por `/software-factory:factory-status` e no final.
+- Testes direcionados durante o fix loop; suíte completa + build uma vez, no Build gate.
+- qa → security → code-reviewer rodam em sequência, nunca em paralelo (limite de API; cada um vê as correções do anterior).
 
 ---
 
-# 2. CREATE PRODUCTION ORDER
+## 1. Discovery (uma vez)
 
-Crie:
+Se `.factory/factory.json` existir com `status` = `IN_PROGRESS` ou `BLOCKED`: pergunte se continua a ordem ou inicia nova. Não sobrescreva.
 
-.factory/
-.factory/factory.json
-.factory/board.md
-.factory/project-plan.md
-.factory/stages/
-.factory/issues/critical/
-.factory/issues/high/
-.factory/issues/medium/
-.factory/issues/low/
-.factory/decisions/
-.factory/artifacts/
+Leia: `CLAUDE.md`, `README`, manifests de build (`package.json`, `pom.xml`, `build.gradle`, `docker-compose.yml`), estrutura de diretórios, funcionalidades semelhantes à solicitada.
 
-Crie uma ordem:
+Grave `.factory/context.md` (alvo: 1–2k tokens):
 
-ORD-001
+```
+# Context — ORD-XXX
+## Stack
+## Comandos
+build / test / typecheck / lint — só os que existem no projeto; marque os que ficam em watch mode
+## Padrões
+camadas, DTOs, normalização, auth/perfis, soft delete, migrations, etc.
+## Referência
+módulo(s) semelhante(s) já implementado(s): paths
+## Arquivos relevantes para esta ordem
+path:linhas — o que é
+## Restrições
+regras do CLAUDE.md do projeto que afetam esta ordem
+```
 
-Caso já exista uma produção ativa, NÃO sobrescreva.
+Não invente informações. O que não confirmar, declare como incerteza.
 
-Pergunte ao usuário se deseja continuar a ordem existente ou iniciar uma nova.
-
----
-
-# 3. PLAN
-
-Crie:
-
-.factory/project-plan.md
-
-Inclua:
-
-- objetivo
-- requisitos
-- critérios de aceite
-- escopo
-- fora do escopo
-- stack
-- módulos afetados
-- agentes necessários
-- etapas necessárias
-- etapas que serão puladas
-- riscos
+Registre `baseCommit` = `git rev-parse HEAD` (se houver git; senão `null`).
 
 ---
 
-# 4. SELECT PRODUCTION LINE
+## 2. Plano e tier
 
-Você NÃO deve executar todos os agentes.
+Grave `.factory/plan.md`: objetivo, requisitos, critérios de aceite, escopo, fora do escopo, módulos afetados, riscos, agentes e etapas (SKIPPED com justificativa de uma linha).
 
-Determine quais especialistas realmente são necessários.
+Escolha o tier:
 
-Exemplo:
+| Tier | Quando | Linha de produção |
+|------|--------|-------------------|
+| `quick` | bugfix, ajuste em 1–3 arquivos, sem schema/API nova | dev (software-engineer, backend-dev ou frontend-dev) → test → code-reviewer |
+| `standard` | feature em uma camada, sem schema novo | architect → dev(s) → qa → security → code-reviewer → build |
+| `full` | feature cross-camada, schema novo, integração externa, infra | architecture → ux-ui → database → contracts → backend → frontend → qa → security → code-reviewer → devops → build |
 
-SPA estática:
+Etapas fora do tier ficam `SKIPPED`. Nunca execute todos os agentes por padrão. Pode subir de tier no meio se o escopo crescer — registre o motivo.
 
-- architect: SIM
-- ux-ui: SIM
-- frontend-dev: SIM
-- qa: SIM
-- security: SIM
-- code-reviewer: SIM
-- devops: conforme necessidade
-- backend-dev: NÃO
-- dba: NÃO
+Crie `.factory/factory.json`:
 
-Feature backend:
+```json
+{
+  "order": "ORD-001",
+  "feature": "...",
+  "tier": "quick|standard|full",
+  "baseCommit": "<sha|null>",
+  "status": "IN_PROGRESS",
+  "currentStage": "discovery",
+  "stages": { "<stage>": "PENDING|IN_PROGRESS|DONE|FAILED|BLOCKED|SKIPPED" },
+  "gates": { "architecture": "PENDING", "database": "PENDING", "contract": "PENDING", "qa": "PENDING", "security": "PENDING", "review": "PENDING", "build": "PENDING" },
+  "issues": [
+    { "id": "ISSUE-001", "severity": "CRITICAL|HIGH|MEDIUM|LOW", "source": "QA|SECURITY|REVIEW|BUILD|ARCHITECTURE",
+      "status": "OPEN|IN_PROGRESS|RESOLVED|WONT_FIX|BLOCKED", "file": "path:line", "problem": "...", "fix": "..." }
+  ],
+  "filesChanged": []
+}
+```
 
-- architect: SIM
-- backend-dev: SIM
-- dba: se houver persistência
-- qa: SIM
-- security: SIM
-- code-reviewer: SIM
+Gates: `PENDING | PASSED | FAILED`. Gate de etapa SKIPPED fica `PENDING` com nota no plano.
 
----
+Atualize `factory.json` ao fim de cada etapa com um `Edit` pontual — não reescreva o arquivo inteiro.
 
-# 5. EXECUTION
+Estrutura final de `.factory/`:
 
-Execute as etapas necessárias:
-
-Discovery
-→ Architecture
-→ UX/UI
-→ Database
-→ Contracts
-→ Backend
-→ Frontend
-→ QA
-→ Security
-→ Code Review
-→ DevOps
-→ Build
-→ Final Report
-
-Não execute etapas marcadas como SKIPPED.
-
-Atualize `factory.json` e `board.md` depois de cada etapa.
+```
+context.md   plan.md   factory.json   stages/<stage>.md   final-report.md   board.md (gerado)
+```
 
 ---
 
-# 6. ARTIFACTS
+## 3. Delegação
 
-Cada etapa deve registrar seu resultado.
+Toda delegação a um agente contém, nesta ordem:
 
-Use:
+1. Objetivo (1–3 linhas)
+2. Conteúdo de `.factory/context.md` (cole; não mande o agente ler o repositório)
+3. Trechos dos artifacts anteriores que importam (ex.: seção de contratos de `stages/architecture.md`)
+4. Arquivos a ler/tocar (`path:linhas`)
+5. Restrições
+6. Artifact esperado: `.factory/stages/<stage>.md`
+7. Critérios de sucesso
+8. "Responda no formato compacto" (seção 6)
 
-.factory/stages/
-
-Exemplos:
-
-architecture.md
-ux.md
-database.md
-contracts.md
-backend.md
-frontend.md
-qa.md
-security.md
-code-review.md
-devops.md
+Não peça ao agente para "analisar o projeto". Isso já foi feito.
 
 ---
 
-# 7. ISSUES
+## 4. Quality gates
 
-Qualquer problema encontrado deve virar uma issue.
-
-Formato:
-
-.factory/issues/<severity>/ISSUE-XXX.md
-
-Cada issue deve conter:
-
-# ISSUE-XXX
-
-## Severity
-
-CRITICAL | HIGH | MEDIUM | LOW
-
-## Source
-
-QA | SECURITY | REVIEW | BUILD | ARCHITECTURE
-
-## Description
-
-## Impact
-
-## Affected Files
-
-## Recommended Fix
-
-## Status
-
-OPEN | IN_PROGRESS | RESOLVED | WONT_FIX
-
----
-
-# 8. QUALITY GATES
-
-Nenhuma etapa crítica pode ser considerada concluída sem passar pelo seu gate.
-
-Nunca declare READY se existir:
+Nunca declare `READY` com:
 
 - CRITICAL aberto
 - HIGH de segurança aberto
 - build quebrado
 - teste crítico falhando
-- requisito obrigatório não implementado
+- requisito obrigatório não atendido
+
+Gate `PASSED` só com evidência (saída de comando, artifact). Não aceite "parece ok".
 
 ---
 
-# 9. FIX LOOP
+## 5. Fix loop
 
-Quando QA, Security ou Code Review encontrar problemas:
+Para cada issue `OPEN`, na ordem CRITICAL → HIGH → MEDIUM → LOW:
 
-1. registre a issue
-2. classifique severity
-3. selecione o agente adequado
-4. execute a correção
-5. execute testes novamente
-6. execute review novamente quando necessário
-7. atualize a issue
-8. atualize o production board
+1. selecione o agente pelo domínio: arquitetura→`architect` · banco→`dba` · backend→`backend-dev` · frontend→`frontend-dev` · teste→`qa` · segurança→`security` · infra→`devops` · UX→`ux-ui`
+2. delegue com a issue (`problem`, `file`, `fix`) + `context.md` + arquivos afetados
+3. teste direcionado (classe/spec específico), não a suíte completa
+4. `status` → `RESOLVED` só com evidência; sem solução → `BLOCKED` + motivo
+5. re-review só se a correção tocou arquitetura/contratos; re-security só se tocou auth/input/segredos
 
----
+Não altere requisitos para fazer uma issue desaparecer.
 
-# 10. FINAL STATUS
-
-Use somente:
-
-READY
-READY_WITH_WARNINGS
-BLOCKED
-FAILED
-
-READY:
-
-Tudo validado.
-
-READY_WITH_WARNINGS:
-
-Funcionalidade entregue, mas existem riscos não bloqueantes.
-
-BLOCKED:
-
-Existe dependência ou problema que impede conclusão.
-
-FAILED:
-
-A execução não conseguiu produzir uma implementação válida.
+Após o loop: suíte completa + build uma vez (comandos de `context.md`).
 
 ---
 
-# 11. FINAL REPORT
+## 6. Formato de resposta dos agentes
 
-Crie:
+Exija de todo agente (máximo ~20 linhas):
 
-.factory/final-report.md
+```
+STAGE: <nome> | RESULT: DONE|FAILED|BLOCKED
+ARTIFACT: .factory/stages/<stage>.md
+FILES: path, path, ...
+FINDINGS:
+path:line: SEVERITY: problema. fix.
+NOTES: só o que o orchestrator precisa para decidir
+```
 
-Inclua:
+Sem prosa, sem repetir o artifact, sem elogios.
 
-- Order
-- Feature
-- Requirements
-- Architecture
-- UX/UI
-- Database
-- Contracts
-- Backend
-- Frontend
-- QA
-- Security
-- Code Review
-- DevOps
-- Build
-- Files Changed
-- Issues
-- Risks
-- Final Status
+---
+
+## 7. Conflitos entre agentes
+
+Prioridade: requisitos > padrões existentes do projeto > segurança > manutenção. Registre a decisão em `stages/architecture.md` (seção "Decisões").
+
+---
+
+## 8. Final
+
+Status: `READY | READY_WITH_WARNINGS | BLOCKED | FAILED`
+
+- `READY`: tudo validado.
+- `READY_WITH_WARNINGS`: entregue; riscos não bloqueantes abertos.
+- `BLOCKED`: dependência ou problema impede conclusão.
+- `FAILED`: não produziu implementação válida.
+
+Grave `.factory/final-report.md` (curto — detalhe fica em `stages/*.md`):
+
+```
+# ORD-XXX — <feature>
+## Status
+## Arquivos alterados
+## Gates (tabela stage → resultado; SKIPPED aparece só aqui)
+## Issues abertas (id, severity, resumo)
+## Riscos / pendências
+## Como validar (comandos)
+```
+
+Atualize `factory.json` (`status`, `filesChanged`) e gere `board.md` a partir dele.

@@ -1,85 +1,29 @@
 ---
 name: factory-fix
-description: Analisa as issues abertas da Software Factory, seleciona os agentes responsáveis, corrige os problemas e executa a validação novamente.
-disable-model-invocation: true
+description: Corrige as issues OPEN do factory.json por severidade, delegando ao agente do domínio, com teste direcionado por issue e revalidação ao final.
 ---
 
 # Factory Fix
 
-Leia:
+Leia `.factory/factory.json` e `.factory/context.md`. Filtre `issues[]` com `status: OPEN`. Ordem: CRITICAL → HIGH → MEDIUM → LOW.
 
-.factory/factory.json
-.factory/board.md
-.factory/issues/
-.factory/stages/qa.md
-.factory/stages/security.md
-.factory/stages/code-review.md
-
-Liste todas as issues OPEN.
-
-Prioridade:
-
-1. CRITICAL
-2. HIGH
-3. MEDIUM
-4. LOW
+Argumento opcional: `$ARGUMENTS` = ids específicos (ex.: `ISSUE-003 ISSUE-005`).
 
 Para cada issue:
 
-1. entenda o problema
-2. identifique o domínio
-3. selecione o agente adequado
-4. forneça contexto
-5. aplique a correção
-6. execute testes relacionados
-7. valide a correção
-8. altere status para RESOLVED
+1. marque `IN_PROGRESS`
+2. agente pelo domínio: arquitetura→`architect` · banco→`dba` · backend→`backend-dev` · frontend→`frontend-dev` · teste→`qa` · segurança→`security` · infra→`devops` · UX→`ux-ui`
+3. delegue com: issue (`problem`, `file`, `fix`), conteúdo de `context.md`, arquivos afetados, "Responda no formato compacto"
+4. teste direcionado (classe/spec do arquivo tocado) — não a suíte completa
+5. `RESOLVED` só com evidência; sem solução → `BLOCKED` + motivo
 
-Mapeamento:
+Após todas:
 
-Architecture
-→ architect
+- suíte completa + build via `/software-factory:factory-test` (uma vez)
+- `/software-factory:factory-review` só se alguma correção tocou arquitetura/contratos
+- `/software-factory:factory-security` só se alguma correção tocou auth/input/segredos
+- atualize `factory.json` (issues, gates)
 
-UX/UI
-→ ux-ui
+Nunca altere requisitos para fazer uma issue desaparecer.
 
-Database
-→ dba
-
-Backend
-→ backend-dev
-
-Frontend
-→ frontend-dev
-
-Testing
-→ qa
-
-Security
-→ security
-
-Code quality
-→ code-reviewer
-
-Infrastructure
-→ devops
-
-Após as correções:
-
-1. execute /factory-test internamente
-2. execute revisão quando necessário
-3. execute security novamente se a correção afetar segurança
-4. atualize factory.json
-5. atualize board.md
-
-Nunca marque uma issue como RESOLVED sem validar a correção.
-
-Se uma issue não puder ser corrigida:
-
-marque:
-
-BLOCKED
-
-e explique o motivo.
-
-Não altere requisitos para fazer uma issue desaparecer.
+Responda: tabela `id | severity | RESOLVED/BLOCKED | arquivo`.

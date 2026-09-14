@@ -2,33 +2,24 @@
 
 Multi-agent Software Factory para Claude Code.
 
-## Agentes
-
-- Orchestrator
-- Architect
-- Software Engineer
-- Backend Developer
-- Frontend Developer
-- UX/UI
-- DBA
-- Security
-- QA
-- Code Reviewer
-- DevOps
-
-## Stack inicial
-
-- Java
-- Spring Boot
-- Angular
-- Oracle
-- PostgreSQL
-- Docker
-- Jenkins
-
 ## Instalação local
 
 No Claude Code:
 
 ```text
 /plugin marketplace add ./software-factory
+/plugin install software-factory@software-factory-marketplace
+```
+
+## Uso
+
+```text
+/software-factory:factory <descreva a funcionalidade>
+/software-factory:factory-status
+/software-factory:factory-test [escopo]
+/software-factory:factory-review
+/software-factory:factory-security
+/software-factory:factory-fix [ISSUE-001 ...]
+```
+
+Detalhes em `plugins/software-factory/README.md`.

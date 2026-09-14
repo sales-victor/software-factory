@@ -1,54 +1,23 @@
 ---
-name: factory-review
-description: Executa uma revisão completa da implementação atual usando o Code Reviewer e atualiza o quadro da Software Factory.
+name: factory-status
+description: Mostra o estado da ordem de produção ativa (tier, stages, gates, issues, próximo passo) a partir de .factory/factory.json e regenera board.md.
 disable-model-invocation: true
 ---
 
-# Factory Review
+# Factory Status
 
-Leia:
+Leia `.factory/factory.json`.
 
-.factory/factory.json
-.factory/project-plan.md
-.factory/board.md
+Se não existir: responda "Não existe nenhuma ordem de produção ativa neste projeto." e pare. Não crie ordem.
 
-Inspecione o código atual.
+Mostre:
 
-Delegue a revisão para `code-reviewer`.
+1. ordem, feature, tier, status, etapa atual
+2. stages com estado
+3. gates
+4. issues por severity (id, status, resumo de uma linha)
+5. próximo passo recomendado (uma linha)
 
-Avalie:
+Regenere `.factory/board.md` a partir do JSON (tabelas: stages, gates, issues).
 
-- arquitetura
-- organização
-- qualidade
-- duplicação
-- manutenção
-- bugs
-- performance
-- tratamento de erros
-- segurança
-- testes
-- aderência aos requisitos
-
-Crie ou atualize:
-
-.factory/stages/code-review.md
-
-Crie issues quando necessário.
-
-Atualize:
-
-.factory/factory.json
-.factory/board.md
-
-Não corrija automaticamente os problemas.
-
-Para correção use `/software-factory:factory-fix`.
-
-Informe:
-
-- problemas encontrados
-- severity
-- arquivos afetados
-- recomendações
-- Review Gate
+Não modifique código nem `factory.json` (exceto para corrigir JSON inválido, avisando).

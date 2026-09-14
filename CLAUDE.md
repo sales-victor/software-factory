@@ -1,135 +1,35 @@
 # Software Factory
 
-Este projeto utiliza uma arquitetura de desenvolvimento baseada em agentes especializados.
-
-## Objetivo
-
-O objetivo é desenvolver software utilizando uma abordagem semelhante a uma equipe profissional:
-
-- Product/Requirements
-- Arquitetura
-- UX/UI
-- Engenharia de Software
-- Backend
-- Frontend
-- Banco de Dados
-- QA
-- Segurança
-- Code Review
-- DevOps
+Plugin de desenvolvimento multi-agente para Claude Code. O usuário abre uma ordem com `/software-factory:factory <pedido>`; a sessão principal atua como orchestrator e delega a agentes especializados.
 
 ## Princípios
 
-### 1. Não implementar antes de entender
+1. **Entender antes de implementar** — requisito, código existente, padrões, dependências, impacto, só então solução.
+2. **Consistência** — o código existente é a referência. Sem framework, padrão, abstração ou biblioteca nova sem justificativa.
+3. **Mudanças pequenas** — isoladas, fáceis de revisar.
+4. **Segurança desde o início** — autenticação, autorização, validação, exposição de dados, logs, injection, XSS, CSRF, secrets, dependências.
+5. **Testes** — toda alteração relevante tem teste.
+6. **Não inventar** — tabelas, colunas, APIs, endpoints, regras, permissões, comportamentos. Incerteza é declarada.
 
-Antes de alterar código:
+## Economia de tokens
 
-1. Entender o requisito.
-2. Inspecionar o código existente.
-3. Identificar padrões existentes.
-4. Identificar dependências.
-5. Avaliar impacto.
-6. Definir a solução.
+- Discovery acontece **uma vez** (orchestrator) e vira `.factory/context.md`. Agentes não refazem discovery.
+- Delegação sempre lista arquivos (`path:linhas`); agente não lê fora da lista sem necessidade.
+- Agente grava artifact em `.factory/stages/` e responde só no formato compacto (`STAGE / RESULT / ARTIFACT / FILES / FINDINGS / NOTES`).
+- QA, Security e Code Review analisam `git diff <baseCommit>`, não o repositório.
+- `.factory/factory.json` é a única fonte de verdade (stages, gates, issues). `board.md` é gerado.
+- Tier por tamanho da ordem: `quick` (bugfix, 1–3 arquivos) · `standard` (feature em uma camada) · `full` (cross-camada, schema, infra).
+- Testes direcionados no fix loop; suíte completa + build uma vez no Build gate.
+- QA → Security → Code Review em sequência, nunca em paralelo.
 
-### 2. Preferir consistência
+## Stack
 
-O código existente é a principal referência.
-
-Não introduzir:
-
-- novos frameworks sem necessidade;
-- novos padrões sem justificativa;
-- abstrações desnecessárias;
-- bibliotecas redundantes.
-
-### 3. Mudanças pequenas
-
-Preferir alterações pequenas, isoladas e fáceis de revisar.
-
-### 4. Segurança desde o início
-
-Toda funcionalidade deve considerar:
-
-- autenticação;
-- autorização;
-- validação de entrada;
-- exposição de dados;
-- logs;
-- SQL Injection;
-- XSS;
-- CSRF;
-- controle de acesso;
-- secrets;
-- dependências vulneráveis.
-
-### 5. Testes
-
-Toda alteração relevante deve possuir testes adequados.
-
-### 6. Não inventar
-
-Nunca inventar:
-
-- tabelas;
-- colunas;
-- APIs;
-- endpoints;
-- regras de negócio;
-- permissões;
-- comportamentos existentes.
-
-Quando uma informação não puder ser confirmada, declarar a incerteza.
-
-## Stack padrão
-
-Quando aplicável:
-
-### Backend
-
-- Java 11+
-- Spring Boot
-- Spring Data
-- Spring Security
-- JPA/Hibernate
-- Maven
-- REST
-
-### Frontend
-
-- Angular
-- TypeScript
-- RxJS
-- Angular Material
-
-### Banco
-
-- Oracle
-- PostgreSQL
-
-### Infraestrutura
-
-- Docker
-- Jenkins
-- Linux
-- Cloud
+Não é fixa. Vem do `CLAUDE.md` e dos manifests do projeto onde a factory roda, registrada em `context.md`. Os agentes são especializados (Java/Spring, Angular, SQL) mas não assumem versão, SGBD nem pipeline.
 
 ## Definition of Done
 
-Uma funcionalidade é considerada concluída somente quando:
-
-- [ ] Requisito entendido
-- [ ] Arquitetura avaliada
-- [ ] Banco avaliado
-- [ ] Backend implementado
-- [ ] Frontend implementado
-- [ ] Testes implementados
-- [ ] Segurança avaliada
-- [ ] Code review realizado
-- [ ] Build executado
-- [ ] Documentação atualizada quando necessário
+Requisito entendido · arquitetura avaliada · banco avaliado · backend/frontend implementados · testes · segurança avaliada · code review · build executado · documentação atualizada quando necessário. Etapas fora do tier ficam `SKIPPED` com justificativa.
 
 ## Regra fundamental
 
-Nunca alterar código simplesmente para "fazer funcionar".
-
-A solução deve respeitar arquitetura, segurança, manutenção e padrões existentes.
+Nunca alterar código só para "fazer funcionar". A solução respeita arquitetura, segurança, manutenção e padrões existentes.

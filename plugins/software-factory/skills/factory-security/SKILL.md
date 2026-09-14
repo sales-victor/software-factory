@@ -1,53 +1,26 @@
 ---
 name: factory-security
-description: Executa uma auditoria de segurança da implementação atual usando o agente Security.
-disable-model-invocation: true
+description: Auditoria de segurança do diff da ordem ativa pelo agente security; registra findings como issues no factory.json e atualiza o Security Gate.
 ---
 
 # Factory Security
 
-Leia o estado atual da Factory.
+Leia `.factory/factory.json`, `.factory/context.md`.
 
-Delegue para `security`.
+Escopo: `git diff <baseCommit>` + arquivos alterados. Amplie para o repositório só quando um finding exigir rastrear (ex.: endpoint novo → conferir `SecurityConfig`/guards existentes).
 
-Analise:
+Delegue para `security` com:
 
-- authentication
-- authorization
-- input validation
-- injection
-- XSS
-- CSRF
-- secrets
-- credentials
-- dependencies
-- CORS
-- headers
-- exposição de informações
-- logging
-- configuração
-- OWASP Top 10
+- objetivo
+- conteúdo de `context.md` (inclui modelo de auth/perfis do projeto)
+- lista de arquivos do diff
+- artifact esperado: `.factory/stages/security.md`
+- "Responda no formato compacto"
 
-Crie:
+Para cada finding: adicione entrada em `factory.json.issues` (`source: SECURITY`).
 
-.factory/stages/security.md
+`gates.security`: `FAILED` se houver CRITICAL ou HIGH aberto; senão `PASSED`.
 
-Crie issues classificadas por:
+Não corrija. Correção: `/software-factory:factory-fix`.
 
-CRITICAL
-HIGH
-MEDIUM
-LOW
-
-Atualize:
-
-.factory/factory.json
-.factory/board.md
-
-CRITICAL e HIGH devem bloquear o Security Gate.
-
-Não corrija automaticamente.
-
-Para correções utilize:
-
-/software-factory:factory-fix
+Responda: gate + lista `path:line: SEVERITY: problema`.

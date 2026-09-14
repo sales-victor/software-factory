@@ -1,36 +1,27 @@
 ---
-name: factory-status
-description: Mostra o estado atual da produção da Software Factory, incluindo pipeline, agentes, gates, issues e próximo passo.
-disable-model-invocation: true
+name: factory-review
+description: Revisão independente do diff da ordem ativa pelo agente code-reviewer; registra findings como issues no factory.json e atualiza o Review Gate.
 ---
 
-# Factory Status
+# Factory Review
 
-Leia:
+Leia `.factory/factory.json`, `.factory/plan.md`, `.factory/context.md`.
 
-.factory/factory.json
-.factory/board.md
+Escopo: `git diff <baseCommit> --stat` + arquivos alterados (`filesChanged`). Não revise o repositório inteiro.
 
-Se `.factory/factory.json` não existir:
+Delegue para `code-reviewer` com:
 
-Informe:
+- objetivo
+- conteúdo de `context.md`
+- critérios de aceite de `plan.md`
+- lista de arquivos do diff (`path`)
+- artifact esperado: `.factory/stages/code-review.md`
+- "Responda no formato compacto"
 
-"Não existe nenhuma ordem de produção ativa neste projeto."
+Para cada finding: adicione entrada em `factory.json.issues` (id sequencial, `severity`, `source: REVIEW`, `status: OPEN`, `file`, `problem`, `fix`).
 
-Não crie uma produção automaticamente.
+`gates.review`: `PASSED` se não houver CRITICAL/HIGH abertos; senão `FAILED`.
 
-Caso exista:
+Não corrija. Correção: `/software-factory:factory-fix`.
 
-1. mostre ordem atual
-2. mostre status geral
-3. mostre progresso
-4. mostre pipeline
-5. mostre agentes
-6. mostre gates
-7. mostre issues por severity
-8. mostre etapa atual
-9. mostre próximo passo recomendado
-
-Atualize `board.md` se estiver inconsistente com `factory.json`.
-
-Não modifique código.
+Responda: gate + lista `path:line: SEVERITY: problema`.
