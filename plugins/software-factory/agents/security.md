@@ -40,6 +40,7 @@ Sem prosa, sem repetir o artifact, sem elogios. Não invente tabelas, APIs, regr
 - Segredos: senha/token/API key no código, em logs ou no Git.
 - Dependências: usar ferramenta do projeto quando existir (ex.: `dependency-check`, `npm audit`).
 - Logs: sem PII/segredo.
+- Infra (topologia em `context.md`): PostgreSQL só na rede privada da Hetzner — qualquer `ports:` ou bind público do banco é HIGH; credenciais de banco só via env do Dokploy; string de conexão nunca em log/erro/response; app atrás de proxy TLS — não confie em `X-Forwarded-*` sem `forward-headers-strategy` configurado; CORS restrito às origens do frontend publicado.
 
 ## Severity
 

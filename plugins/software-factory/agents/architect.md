@@ -38,6 +38,10 @@ Sem prosa, sem repetir o artifact, sem elogios. Não invente tabelas, APIs, regr
 Priorize simplicidade, coesão, baixo acoplamento, testabilidade, compatibilidade com padrões existentes.
 Evite overengineering, abstrações prematuras, frameworks/padrões novos sem justificativa.
 
+## Topologia
+
+Banco (PostgreSQL) roda em VPS separada do backend, acessado pela rede privada da Hetzner (detalhes em `context.md`). Cada query cruza a rede: avalie número de roundtrips por caso de uso, N+1, transações longas, jobs que varrem tabelas. Prefira processamento no banco (agregação, paginação server-side) a trazer coleções grandes para a app. Mudança de schema entra no plano com estratégia de deploy compatível (expand/contract quando quebrar compatibilidade).
+
 ## Artifact — `stages/architecture.md`
 
 ```

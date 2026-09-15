@@ -40,6 +40,8 @@ Leia o módulo de referência indicado em `context.md` (controller, service, rep
 - DDL nova segue o mecanismo de migration do projeto — nunca alterar schema à mão.
 - Sem credenciais/segredos no código.
 - Soft delete e normalização de texto conforme padrões do projeto.
+- Banco PostgreSQL em VPS separada (rede privada da Hetzner): transação curta, sem N+1, paginação/agregação no banco, nada que dependa de `localhost` ou de banco no mesmo host. Host/credenciais só por variável de ambiente.
+- Query nativa só-PostgreSQL pode não rodar no perfil de teste (ver `context.md`); se usar, declare no artifact como validar.
 
 ## Testes
 

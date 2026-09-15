@@ -29,7 +29,20 @@ Sem prosa, sem repetir o artifact, sem elogios. Não invente tabelas, APIs, regr
 
 ## SGBD
 
-SGBD, versão e mecanismo de migration vêm de `context.md`. Não assuma recursos não confirmados para aquela versão. Toda DDL segue o mecanismo de migration do projeto (nunca alteração manual).
+PostgreSQL. Versão exata e mecanismo de migration vêm de `context.md`. Não assuma recursos não confirmados para aquela versão. Toda DDL segue o mecanismo de migration do projeto (nunca alteração manual).
+
+PostgreSQL — use, quando fizer sentido: índice parcial, `CREATE INDEX CONCURRENTLY` (fora de transação — confira se o mecanismo de migration permite), `pg_advisory_xact_lock` para serialização, `ADD COLUMN ... DEFAULT` sem rewrite (PG 11+), tipos nativos (`jsonb`, `numeric`, `timestamptz`). Evite: `ALTER COLUMN TYPE` em tabela grande sem plano, DDL que segura `ACCESS EXCLUSIVE` por muito tempo, `NOT NULL` sem backfill prévio.
+
+Se o perfil de teste do projeto usa outro SGBD emulando PostgreSQL (ex.: H2 `MODE=PostgreSQL`), sintaxe só-PostgreSQL não roda nos testes — declare isso no artifact e indique como validar.
+
+## Topologia
+
+O banco roda em VPS própria (Hetzner), separada da VPS do backend; acesso só pela rede privada da Hetzner. Consequências:
+
+- Nunca conecte em produção nem rode DDL/DML à mão. Validação é local (ambiente de dev) ou via migration no deploy.
+- Nunca assuma `localhost`, socket unix ou banco no mesmo container/host do backend. Host/porta vêm de `SPRING_DATASOURCE_URL` (ou equivalente em `context.md`).
+- Cada roundtrip cruza a rede: query chatty, N+1 e transação longa custam mais do que em banco local. Prefira lote, `JOIN`/fetch adequado, transação curta.
+- Migration roda no startup do backend, no deploy do Dokploy. Migration lenta ou que bloqueia = deploy travado e healthcheck falhando. Estime duração e bloqueio para a tabela alvo.
 
 ## Antes de alterar
 
@@ -41,7 +54,7 @@ Full scan, joins, filtros, índices, cardinalidade, N+1, função sobre coluna i
 
 ## Regra crítica
 
-Toda alteração estrutural tem: script, rollback, análise de impacto em dados existentes, compatibilidade com o código em produção durante o deploy.
+Toda alteração estrutural tem: script, rollback, análise de impacto em dados existentes, compatibilidade com o código em produção durante o deploy (no Dokploy a versão antiga e a nova podem coexistir por instantes; DDL precisa ser compatível com as duas).
 
 ## Artifact — `stages/database.md`
 

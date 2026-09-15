@@ -43,6 +43,8 @@ Grave `.factory/context.md` (alvo: 1–2k tokens):
 ## Stack
 ## Comandos
 build / test / typecheck / lint — só os que existem no projeto; marque os que ficam em watch mode
+## Infra
+topologia de deploy (VPS, containers, onde roda o banco, rede entre app e banco), SGBD + versão, mecanismo de migration, como variáveis/segredos chegam ao runtime. Padrão deste usuário: 2 VPS Hetzner com Dokploy — VPS 1 = backend + frontend, VPS 2 = PostgreSQL; app fala com o banco pela rede privada da Hetzner (IP privado, sem porta pública). Confirme no `docker-compose.yml`/`CLAUDE.md` do projeto; se divergir, o projeto manda.
 ## Padrões
 camadas, DTOs, normalização, auth/perfis, soft delete, migrations, etc.
 ## Referência

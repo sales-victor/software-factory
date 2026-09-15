@@ -46,6 +46,10 @@ Plugin de desenvolvimento multi-agente para Claude Code. A sessão principal atu
 
 Todos seguem o mesmo contrato: recebem `context.md`, não refazem discovery, gravam artifact em `.factory/stages/<stage>.md`, respondem no formato compacto.
 
+## Infra de referência
+
+Agentes `architect`, `backend-dev`, `dba`, `devops` e `security` conhecem a topologia padrão do usuário: 2 VPS Hetzner com Dokploy — uma com backend + frontend, outra com PostgreSQL — comunicação app↔banco pela rede privada da Hetzner, sem porta pública no banco, segredos via env do Dokploy. `context.md` registra a topologia real do projeto na seção `## Infra`; se divergir, `context.md` manda.
+
 ## Estado (`.factory/`)
 
 ```

@@ -24,7 +24,11 @@ Plugin de desenvolvimento multi-agente para Claude Code. O usuário abre uma ord
 
 ## Stack
 
-Não é fixa. Vem do `CLAUDE.md` e dos manifests do projeto onde a factory roda, registrada em `context.md`. Os agentes são especializados (Java/Spring, Angular, SQL) mas não assumem versão, SGBD nem pipeline.
+Não é fixa. Vem do `CLAUDE.md` e dos manifests do projeto onde a factory roda, registrada em `context.md`. Os agentes são especializados (Java/Spring, Angular, PostgreSQL) mas não assumem versão nem pipeline.
+
+## Infra de referência
+
+Topologia padrão do usuário (registrada em `context.md` → `## Infra`, confirmada no discovery): 2 VPS Hetzner com Dokploy — VPS app (backend + frontend, TLS no proxy do Dokploy) e VPS banco (PostgreSQL, só rede privada da Hetzner, sem porta pública). Backend alcança o banco por IP privado via variável de ambiente; segredos vivem no Dokploy, não no Git. Agentes `dba`, `devops`, `security`, `architect` e `backend-dev` carregam as consequências dessa topologia (banco remoto, migration no deploy, sem acesso direto a produção). Se o projeto divergir, `context.md` manda.
 
 ## Definition of Done
 
